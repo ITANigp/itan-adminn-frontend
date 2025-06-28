@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "postinstall": "node copy-pdf-worker.js",
     "dev": "next dev -p 8000",
     "build": "next build",
     "start": "next start",
