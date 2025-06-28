@@ -38,7 +38,7 @@ const Layout = ({ children }) => {
     try {
       await signOutAdmin();
       toast.success("Logged out successfully!");
-      router.push("/admin");
+      router.push("/");
     } catch (err) {
       toast.error("Sign-out failed. Please try again.");
     }
