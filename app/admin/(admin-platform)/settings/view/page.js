@@ -44,24 +44,24 @@ export default function AuthorProfilePage() {
         />
         <div>
           <h1 className="text-3xl font-semibold text-gray-800">
-            {author.first_name} {author.last_name}
+            {author?.first_name ?? "Author's Name"} {author?.last_name ?? ""}
           </h1>
-          <p className="text-gray-500">{author.bio}</p>
+          <p className="text-gray-500">{author?.bio ?? ""}</p>
         </div>
       </div>
 
       <div className="space-y-3 text-gray-700">
         <p>
           <span className="font-medium text-gray-800">Phone:</span>{" "}
-          {author.phone_number}
+          {author?.phone_number ?? ""}
         </p>
         <p>
           <span className="font-medium text-gray-800">Country:</span>{" "}
-          {author.country}
+          {author?.country ?? ""}
         </p>
         <p>
           <span className="font-medium text-gray-800">Location:</span>{" "}
-          {author.location}
+          {author?.location ?? ""}
         </p>
       </div>
     </div>
