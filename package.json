@@ -3,12 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-<<<<<<< HEAD
     "postinstall": "node copy-pdf-worker.js",
     "dev": "next dev -p 8000",
-=======
-    "dev": "next dev -p 9000",
->>>>>>> 0574ece59a922ad958d8dac597bd5ffa037c950a
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
