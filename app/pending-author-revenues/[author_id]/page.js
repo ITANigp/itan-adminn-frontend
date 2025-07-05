@@ -45,7 +45,7 @@ export default function AuthorPaymentProcessor() {
       setPaymentResult(res.data);
       console.log("Payment result:", res.data);
     } catch (err) {
-      console.error("Error processing payment:", err);
+      console.error("Error processing payment:", err.response.data.error);
       setPaymentResult({ error: "Failed to process payment." });
     } finally {
       setProcessing(false);
