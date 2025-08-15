@@ -38,30 +38,30 @@ export default function AuthorProfilePage() {
     <div className="p-6 mx-auto bg-white rounded-2xl shadow-md mt-10 border my-8 max-w-4xl lg:ml-72 lg:mr-8 lg:mt-24 container">
       <div className="flex items-center space-x-4 mb-6">
         <img
-          src={author.author_profile_image_url}
+          src={author?.author_profile_image_url ?? "/images/avatar.png"}
           alt="Author"
           className="w-24 h-24 rounded-full object-cover shadow"
         />
         <div>
           <h1 className="text-3xl font-semibold text-gray-800">
-            {author.first_name} {author.last_name}
+            {author?.first_name ?? "Author's Name"} {author?.last_name ?? ""}
           </h1>
-          <p className="text-gray-500">{author.bio}</p>
+          <p className="text-gray-500">{author?.bio ?? ""}</p>
         </div>
       </div>
 
       <div className="space-y-3 text-gray-700">
         <p>
           <span className="font-medium text-gray-800">Phone:</span>{" "}
-          {author.phone_number}
+          {author?.phone_number ?? ""}
         </p>
         <p>
           <span className="font-medium text-gray-800">Country:</span>{" "}
-          {author.country}
+          {author?.country ?? ""}
         </p>
         <p>
           <span className="font-medium text-gray-800">Location:</span>{" "}
-          {author.location}
+          {author?.location ?? ""}
         </p>
       </div>
     </div>
