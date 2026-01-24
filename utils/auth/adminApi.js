@@ -49,11 +49,18 @@ export const getAllAuthors = async () => {
     console.log("Error fetching all Authors: ", err);
   }
 };
-export const getAllReaders = async () => {
-  try {
-    const response = await api.get("admin/readers");
-    return response.data.data;
+export const getAllReaders = async (page = 1, per_page = 20) => {
+  try { 
+    const response = await api.get(
+      `admin/readers?page=${page}&per_page=${per_page}`
+    );
+    console.log("API Response:", response);
+    return {
+      data: response.data.data || [],
+      meta: response.data.meta || null,
+    };
   } catch (err) {
     console.log("Error fetching all Readers: ", err);
+    return { data: [], meta: null };
   }
 };
