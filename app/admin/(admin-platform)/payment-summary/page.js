@@ -142,7 +142,7 @@ const AdminFinancePage = () => {
               <p>$ {formatCurrency(summary.paystack_fees)}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-1">Delivery Fees</h3>
+              <h3 className="text-lg font-semibold mb-1">Storage Fees</h3>
               <p>$ {formatCurrency(summary.delivery_fees)}</p>
             </div>
             <div>
