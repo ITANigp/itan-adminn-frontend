@@ -1,357 +1,17 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import Image from "next/image";
-// import Link from "next/link";
-
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import formatDate from "@/utils/formatDate";
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "@/components/ui/table";
-
-// import dynamic from "next/dynamic";
-// import { Doughnut } from "react-chartjs-2";
-// import { Chart as ChartJS, ArcElement } from "chart.js";
-// import {
-//   faBook,
-//   faBookReader,
-//   faUserEdit,
-//   faMoneyBillWave,
-//   faArrowTrendDown,
-//   faArrowTrendUp,
-//   faSlidersH,
-//   faEllipsisH,
-// } from "@fortawesome/free-solid-svg-icons";
-
-// import { api, getAllBooks } from "@/utils/auth/adminApi";
-
-
-// const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
-
-// ChartJS.register(ArcElement);
-
-
- 
-// const Books = () => {
-//   const [books, setBooks] = useState([]);
-//   const [filter, setFilter] = useState("all");
-//   const [loading, setLoading] = useState(true);
-
-//   const [areaData, setAreaData] = useState({
-//     series: [],
-//     options: {},
-//   });
-
-//   const [doughnutData, setDoughnutData] = useState({
-//     labels: [],
-//     datasets: [],
-//   });
-
-//   useEffect(() => {
-//     setAreaData({
-//       series: [
-//         {
-//           name: "Transactions",
-//           data: [
-//             12000000, 18000000, 15000000, 21000000, 19500000, 20500000,
-//             23000000,
-//           ],
-//         },
-//       ],
-//       options: {
-//         chart: { type: "area", height: 350, toolbar: { show: false } },
-//         dataLabels: { enabled: false },
-//         stroke: { curve: "smooth" },
-//         xaxis: {
-//           categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
-//         },
-//         fill: {
-//           type: "gradient",
-//           gradient: {
-//             shadeIntensity: 1,
-//             opacityFrom: 0.4,
-//             opacityTo: 0.1,
-//             stops: [0, 90, 100],
-//           },
-//         },
-//         colors: ["#EF4444"],
-//       },
-//     });
-
-//     setDoughnutData({
-//       labels: ["Pending", "Approved"],
-//       datasets: [
-//         {
-//           data: [87, 344],
-//           backgroundColor: ["#FF3C00", "#00C851"],
-//         },
-//       ],
-//     });
-//   }, []);
-
-//   const Dougnut = () => (
-//     <div className="w-full max-w-[100px] sm:max-w-[120px] md:max-w-[140px]">
-//       {doughnutData?.datasets && <Doughnut data={doughnutData} />}
-//     </div>
-//   );
-
-
-//   useEffect(() => {
-//     const fetchBooks = async () => {
-//       try {
-//         const books = await getAllBooks();
-//         setBooks(books || []);
-//         console.log("All books from Admin Panel:", books);
-//       } catch (error) {
-//         console.error("Failed to fetch books", error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchBooks();
-//   }, []);
-
-//   const filteredBooks = books.filter((book) => {
-//     if (filter === "all") return true;
-//     return book.approval_status === filter;
-//   });
-
-//   const handleReject = async (bookId) => {
-//     try {
-//       const response = await api.patch(`/admin/books/${bookId}/reject`, {
-//         admin_feedback:
-//           "This book needs revisions on chapters 2-4. Content is inappropriate.",
-//       });
-//       console.log("Book is rejected: ", response.data);
-//     } catch (err) {
-//       console.log("Error rejecting the book: ", err);
-//     }
-//   };
-
-//   const handleApprove = async (bookId) => {
-//     try {
-//       const response = await api.patch(`/admin/books/${bookId}/approve`, {
-//         admin_feedback: "Congratulations, your book is approved",
-//       });
-//       console.log("Book is approved: ", response.data);
-//     } catch (err) {
-//       console.log("Error approving the book: ", err);
-//     }
-//   };
-
-//   if (loading) {
-//     return <p className="ml-3 mt-5">Loading books...</p>;
-//   }
-
-//   return (
-//     <div className="ml-3">
-//       <h2>Payments</h2>
-//       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-//         {[
-//           {
-//             title: "Books",
-//             value: "1589",
-//             color: "purple",
-//             icon: faBook,
-//             trend: -5.5,
-//           },
-//           {
-//             title: "Readers",
-//             value: "9,458",
-//             color: "green",
-//             icon: faBookReader,
-//             trend: +6.5,
-//           },
-//           {
-//             title: "Authors",
-//             value: "2,946",
-//             color: "teal",
-//             icon: faUserEdit,
-//             trend: -5.5,
-//           },
-//         ].map((item, idx) => (
-//           <div key={idx} className="bg-white rounded-2xl p-4 shadow-md w-full">
-//             <div className="flex justify-between items-center mb-4">
-//               <div>
-//                 <h2 className="text-md font-semibold text-gray-700 mb-2">
-//                   {item.title}
-//                 </h2>
-//                 <h3 className="text-3xl font-bold text-black">{item.value}</h3>
-//               </div>
-//               <div className={`bg-${item.color}-100 p-4 rounded-full`}>
-//                 <FontAwesomeIcon
-//                   icon={item.icon}
-//                   className={`text-${item.color}-500 text-2xl`}
-//                 />
-//               </div>
-//             </div>
-//             <div
-//               className={`flex items-center mt-2 text-sm ${item.trend < 0 ? "text-red-500" : "text-green-500"}`}
-//             >
-//               <FontAwesomeIcon
-//                 icon={item.trend < 0 ? faArrowTrendDown : faArrowTrendUp}
-//                 className="mr-1"
-//               />
-//               <span className="font-medium">{item.trend}%</span>
-//               <span className="text-gray-500 ml-1">since last month</span>
-//             </div>
-//           </div>
-//         ))}
-
-//         {/* Doughnut Chart */}
-//         <div className="bg-white rounded-2xl p-4 shadow-md w-full">
-//           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-//             <div>
-//               <FontAwesomeIcon
-//                 icon={faMoneyBillWave}
-//                 className="text-green-500 text-2xl mb-2"
-//               />
-//               <h3 className="text-xl font-bold text-black">1,289</h3>
-//               <h2 className="text-sm font-semibold text-gray-700 mt-2">
-//                 Approved Payments
-//               </h2>
-//             </div>
-//             <Dougnut />
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="grid grid-cols-2 text-center my-5 items-center">
-//         <p className="bg-red-500 h-10 flex items-center justify-center text-white">
-//           Approved
-//         </p>
-//         <p className="border border-gray-300 h-10 flex items-center justify-center">
-//           Pending
-//         </p>
-//       </div>
-
-//       <div className="overflow-x-auto w-full max-w-[850px] relative">
-//         <Table>
-//           <TableHeader>
-//             <TableRow className="bg-slate-700 hover:bg-slate-700 rounded-lg">
-//               <TableHead className="text-white">Account Name</TableHead>
-//               <TableHead className="text-white">Amount</TableHead>
-//               <TableHead className="text-white">Book Name</TableHead>
-//               <TableHead className="text-white">Book Type</TableHead>
-//               <TableHead className="text-white">Date</TableHead>
-//               <TableHead className="text-white">Status</TableHead>
-//               <TableHead className="text-white"></TableHead>
-//             </TableRow>
-
-//             <TableRow className="hover:bg-white">
-//               <TableHead>
-//                 <button
-//                   onClick={() => setFilter("all")}
-//                   className="px-4 py-2 bg-gray-200 rounded"
-//                 >
-//                   All
-//                 </button>
-//               </TableHead>
-//               <TableHead>
-//                 <button
-//                   onClick={() => setFilter("pending")}
-//                   className="px-4 py-2 bg-yellow-200 rounded"
-//                 >
-//                   Pending
-//                 </button>
-//               </TableHead>
-//               <TableHead>
-//                 <button
-//                   onClick={() => setFilter("rejected")}
-//                   className="px-4 py-2 bg-red-200 rounded"
-//                 >
-//                   Rejected
-//                 </button>
-//               </TableHead>
-//               <TableHead>
-//                 <button
-//                   onClick={() => setFilter("approved")}
-//                   className="px-4 py-2 bg-green-200 rounded"
-//                 >
-//                   Approved
-//                 </button>
-//               </TableHead>
-//               <TableHead />
-//               <TableHead>
-//                 <FontAwesomeIcon
-//                   icon={faSlidersH}
-//                   className="text-slate-700 w-6 h-10 py-1 bg-slate-100 shadow-lg rounded-md cursor-pointer"
-//                 />
-//               </TableHead>
-//             </TableRow>
-//           </TableHeader>
-
-//           <TableBody>
-//             {filteredBooks.length > 0 ? (
-//               filteredBooks.map((book) => (
-//                 <TableRow key={book.id}>
-//                   <TableCell className="font-medium">
-//                     <Link href={`/admin/books/book-details/${book.id}`}>
-//                       <Image
-//                         src={book.cover_image_url}
-//                         width={70}
-//                         height={120}
-//                         alt="book cover"
-//                         className="w-24 h-auto"
-//                       />
-//                     </Link>
-//                     <p>{book.title}</p>
-//                   </TableCell>
-//                   <TableCell>
-//                     {book.first_name} {book.last_name}
-//                   </TableCell>
-//                   <TableCell>{book?.unique_book_id ? "Ebook" : ""}</TableCell>
-//                   <TableCell>{book.approval_status}</TableCell>
-//                   <TableCell>{book.date}</TableCell>
-//                   <TableCell>{formatDate(book.created_at)}</TableCell>
-//                   <TableCell className="flex flex-col">
-//                     <FontAwesomeIcon
-//                       icon={faEllipsisH}
-//                       className="cursor-pointer"
-//                     />
-//                     <button
-//                       onClick={() => handleReject(book.id)}
-//                       className="text-red-600 cursor-pointer"
-//                     >
-//                       Reject
-//                     </button>
-//                     <button
-//                       onClick={() => handleApprove(book.id)}
-//                       className="text-green-600 cursor-pointer"
-//                     >
-//                       Accept
-//                     </button>
-//                   </TableCell>
-//                 </TableRow>
-//               ))
-//             ) : (
-//               <TableRow>
-//                 <TableCell colSpan={6} className="text-center py-4">
-//                   No books found for "{filter}"
-//                 </TableCell>
-//               </TableRow>
-//             )}
-//           </TableBody>
-//         </Table>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Books;
-
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { api } from "@/utils/auth/adminApi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  ChevronRight,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  ArrowRightLeft,
+  LayoutDashboard,
+} from "lucide-react"; // Optional: Lucide icons for a pro look
 
 const App = () => {
   const [pendingPayments, setPendingPayments] = useState([]);
@@ -360,95 +20,8 @@ const App = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("approved");
   const [selectedAuthors, setSelectedAuthors] = useState([]);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [detailedAuthorRevenue, setDetailedAuthorRevenue] = useState(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [detailError, setDetailError] = useState(null);
-  const [selectedAuthorId, setSelectedAuthorId] = useState(null);
 
-  useEffect(() => {
-    const fetchPendingPayments = async () => {
-      try {
-        const response = await api.get(`admin/author_revenues`);
-        setPendingPayments(response.data.pending_by_author || []);
-      } catch (err) {
-        console.error("Failed to fetch pending payments:", err);
-        setError("Failed to load pending payments.");
-        setPendingPayments([]);
-      }
-    };
-
-    const fetchApprovedPayments = async () => {
-      try {
-        const response = await api.get(
-          `/admin/author_revenues/processed_batches`
-        );
-        setApprovedPayments(response.data.processed_batches || []);
-      } catch (err) {
-        console.error("Failed to fetch approved payments:", err);
-        setError("Failed to load approved payments.");
-        setApprovedPayments([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPendingPayments();
-    fetchApprovedPayments();
-  }, []);
-
-  const handleAuthorClick = (authorId) => {
-    setSelectedAuthorId(authorId);
-    setShowDetailModal(true);
-    fetchDetailedAuthorRevenue(authorId);
-  };
-
-  const fetchDetailedAuthorRevenue = async (authorId) => {
-    setDetailLoading(true);
-    try {
-      const response = await api.get(`admin/author_revenues/${authorId}`);
-      setDetailedAuthorRevenue(response.data);
-    } catch (err) {
-      console.error("Failed to fetch detailed author revenue:", err);
-      setDetailError("Failed to load details.");
-      setDetailedAuthorRevenue(null);
-    } finally {
-      setDetailLoading(false);
-    }
-  };
-
-  const toggleAuthorSelection = (authorId) => {
-    setSelectedAuthors((prev) =>
-      prev.includes(authorId)
-        ? prev.filter((id) => id !== authorId)
-        : [...prev, authorId]
-    );
-  };
-
-  const handleProcessPayments = async () => {
-    if (selectedAuthors.length === 0) {
-      alert("No authors selected");
-      return;
-    }
-
-    try {
-      const response = await api.post(
-        `/admin/author_revenues/process_payments`,
-        {
-          author_ids: selectedAuthors,
-        }
-      );
-
-      alert(response.data.message);
-      setPendingPayments((prev) =>
-        prev.filter((p) => !selectedAuthors.includes(p.author_id))
-      );
-      setSelectedAuthors([]);
-    } catch (error) {
-      console.error("Payment processing failed:", error);
-      alert("Payment processing failed.");
-    }
-  };
+  const router = useRouter();
 
   const handleTransferFunds = async (batchId) => {
     try {
@@ -461,242 +34,284 @@ const App = () => {
       console.error("Transfer failed:", err);
       alert(
         err?.response?.data?.error ||
-          "Transfer failed. Please ensure author has valid bank details."
+          "Transfer failed. Please ensure author has valid bank details.",
       );
     }
   };
 
-  const closeDetailModal = () => {
-    setShowDetailModal(false);
-    setSelectedAuthorId(null);
-    setDetailedAuthorRevenue(null);
-    setDetailError(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [pendingRes, approvedRes] = await Promise.all([
+          api.get(`admin/author_revenues`),
+          api.get(`/admin/author_revenues/processed_batches`),
+        ]);
+        setPendingPayments(pendingRes.data.pending_by_author || []);
+        setApprovedPayments(approvedRes.data.processed_batches || []);
+      } catch (err) {
+        setError("Failed to synchronize payment data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const toggleAuthorSelection = (authorId) => {
+    setSelectedAuthors((prev) =>
+      prev.includes(authorId)
+        ? prev.filter((id) => id !== authorId)
+        : [...prev, authorId],
+    );
   };
 
-  if (loading) {
+  const handleProcessPayments = async () => {
+    if (selectedAuthors.length === 0)
+      return alert("Select at least one author");
+    try {
+      const response = await api.post(
+        `/admin/author_revenues/process_payments`,
+        { author_ids: selectedAuthors },
+      );
+      alert(response.data.message);
+      setPendingPayments((prev) =>
+        prev.filter((p) => !selectedAuthors.includes(p.author_id)),
+      );
+      setSelectedAuthors([]);
+    } catch (error) {
+      alert("Payment processing failed.");
+    }
+  };
+
+  if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-        <p className="text-lg text-gray-700">Loading payment data...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+        <p className="text-slate-500 font-medium">Syncing Ledger...</p>
       </div>
     );
-  }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8 font-sans">
-      <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-8 text-center">
-        Author Payment Dashboard
-      </h1>
-
-      {/* Tabs */}
-      <div className="flex bg-white shadow-lg rounded-lg mb-8 overflow-hidden">
-        <button
-          className={`flex-1 py-4 text-center text-lg font-semibold transition-colors duration-200 ${
-            activeTab === "approved"
-              ? "bg-red-500 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
-          onClick={() => setActiveTab("approved")}
-        >
-          Approved
-        </button>
-        <button
-          className={`flex-1 py-4 text-center text-lg font-semibold transition-colors duration-200 ${
-            activeTab === "pending"
-              ? "bg-red-500 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
-          onClick={() => setActiveTab("pending")}
-        >
-          Pending
-        </button>
-      </div>
-
-      {/* Approved Payments */}
-      {activeTab === "approved" && (
-        <div className="bg-white shadow-lg rounded-lg p-4 sm:p-6 max-w-full overflow-x-auto">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-700 mb-4">
-            Approved Author Payments by Batch
-          </h2>
-
-          {approvedPayments.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-gray-600 text-lg">
-                No approved payments found.
+    <div className="min-h-screen bg-slate-50 pb-20">
+      {/* Header Section */}
+      <header className="bg-white border-b border-slate-200 mb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                <LayoutDashboard className="text-indigo-600" size={24} />
+                Author Payouts
+              </h1>
+              <p className="text-slate-500 text-sm mt-1">
+                Manage and approve revenue distributions for authors.
               </p>
             </div>
-          ) : (
-            approvedPayments.map((batch) => (
-              <div key={batch.batch_id} className="mb-10 border rounded-lg">
-                {/* Batch Info Header */}
-                <div className="bg-gray-100 p-4 rounded-t-md border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div>
-                    <p className="text-gray-700 font-semibold">
-                      Batch ID:{" "}
-                      <span className="font-mono">{batch.batch_id}</span>
-                    </p>
-                    <p className="text-gray-700">
-                      Total Amount:{" "}
-                      <strong>
-                        ₦{parseFloat(batch.total_amount).toFixed(2)}
-                      </strong>
-                    </p>
-                    <p className="text-gray-700">
-                      Approved Date:{" "}
-                      {new Date(batch.approved_date).toLocaleDateString()}
-                    </p>
-                    <p className="text-gray-700">
-                      Approved Count: {batch.approved_count} | Items:{" "}
-                      {batch.items_count} | Transferred:{" "}
-                      {batch.transferred_count}
-                    </p>
-                    <p className="text-green-600 font-medium">
-                      Status: {batch.status}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleTransferFunds(batch.batch_id)}
-                    className="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition"
-                  >
-                    Transfer Funds
-                  </button>
-                </div>
+            <Link
+              href="/admin/payment-summary"
+              className="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm"
+            >
+              View History
+            </Link>
+          </div>
+        </div>
+      </header>
 
-                {/* Author Table */}
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-white">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Navigation Tabs */}
+        <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-8 border border-slate-200">
+          <button
+            onClick={() => setActiveTab("approved")}
+            className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+              activeTab === "approved"
+                ? "bg-white text-indigo-600 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Approved Batches
+          </button>
+          <button
+            onClick={() => setActiveTab("pending")}
+            className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+              activeTab === "pending"
+                ? "bg-white text-indigo-600 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Pending Approval ({pendingPayments.length})
+          </button>
+        </div>
+
+        {/* Content Area */}
+        <div className="space-y-6">
+          {activeTab === "approved" ? (
+            <div className="grid gap-6">
+              {approvedPayments.length === 0 ? (
+                <EmptyState message="No approved batches found." />
+              ) : (
+                approvedPayments.map((batch) => (
+                  <div
+                    key={batch.batch_id}
+                    className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm"
+                  >
+                    <div className="p-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4 bg-slate-50/50">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-mono font-medium px-2 py-1 bg-slate-200 rounded text-slate-600">
+                            #{batch.batch_id.slice(-8)}
+                          </span>
+                          <span className="px-2 py-1 text-xs font-bold bg-green-100 text-green-700 rounded-full uppercase">
+                            {batch.status}
+                          </span>
+                        </div>
+                        <p className="text-xl font-bold text-slate-900 tracking-tight">
+                          ${parseFloat(batch.total_amount).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
+                          {new Date(batch.approved_date).toLocaleDateString(
+                            undefined,
+                            { dateStyle: "long" },
+                          )}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleTransferFunds(batch.batch_id)}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition shadow-md shadow-indigo-100"
+                      >
+                        <ArrowRightLeft size={16} />
+                        Execute Transfer
+                      </button>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead className="text-[11px] uppercase tracking-wider text-slate-400 font-bold bg-white">
+                          <tr>
+                            <th className="px-6 py-4">Author Details</th>
+                            <th className="px-6 py-4">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {batch.authors.map((author) => (
+                            <tr
+                              key={author.id}
+                              className="group hover:bg-slate-50 transition-colors"
+                            >
+                              <td className="px-6 py-4">
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-semibold text-slate-800">
+                                    {author.name || "N/A"}
+                                  </span>
+                                  <span className="text-xs text-slate-500">
+                                    {author.email}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-1.5 text-green-600 text-xs font-bold">
+                                  <CheckCircle size={14} /> Ready
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : (
+            /* PENDING SECTION */
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="font-bold text-slate-800">
+                  Review Pending Payments
+                </h3>
+                {selectedAuthors.length > 0 && (
+                  <button
+                    onClick={handleProcessPayments}
+                    className="animate-in fade-in zoom-in duration-200 px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-lg hover:bg-emerald-700"
+                  >
+                    Approve Selected ({selectedAuthors.length})
+                  </button>
+                )}
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-[11px] uppercase text-slate-400 font-bold">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Author Name
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Email
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Status
-                      </th>
+                      <th className="px-6 py-3 w-10"></th>
+                      <th className="px-6 py-3">Recipient</th>
+                      <th className="px-6 py-3">Items</th>
+                      <th className="px-6 py-3 text-right">Amount</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {batch.authors.map((author) => (
-                      <tr key={author.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {author.name?.trim() || "N/A"}
+                  <tbody className="divide-y divide-slate-100">
+                    {pendingPayments.map((payment) => (
+                      <tr
+                        key={payment.author_id}
+                        className={`group transition-colors cursor-pointer ${selectedAuthors.includes(payment.author_id) ? "bg-indigo-50/50" : "hover:bg-slate-50"}`}
+                        onClick={() =>
+                          router.push(`/admin/payment/${payment.author_id}`)
+                        }
+                      >
+                        <td
+                          className="px-6 py-4"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                            checked={selectedAuthors.includes(
+                              payment.author_id,
+                            )}
+                            onChange={() =>
+                              toggleAuthorSelection(payment.author_id)
+                            }
+                          />
                         </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
-                          {author.email}
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold text-slate-800">
+                              {payment.author_first_name}{" "}
+                              {payment.author_last_name}
+                            </span>
+                            <span className="text-xs text-slate-500">
+                              {payment.email}
+                            </span>
+                          </div>
                         </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">
-                          Approved
+                        <td className="px-6 py-4 text-sm text-slate-600">
+                          {payment.pending_count} sales
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className="text-sm font-bold text-slate-900">
+                            $
+                            {parseFloat(payment.total_pending_amount).toFixed(
+                              2,
+                            )}
+                          </span>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            ))
+            </div>
           )}
         </div>
-      )}
-
-      {/* Pending Payments */}
-      {activeTab === "pending" && (
-        <div className="bg-white shadow-lg rounded-lg p-4 sm:p-6 max-w-full overflow-x-auto">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-700 mb-4">
-            Pending Author Payments
-          </h2>
-          {pendingPayments.length === 0 ? (
-            <p className="text-center text-gray-500 py-10">
-              No pending payments found.
-            </p>
-          ) : (
-            <>
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Check
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Account Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Email
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Amount
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Count
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {pendingPayments.map((payment) => (
-                    <tr
-                      key={payment.author_id}
-                      className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleAuthorClick(payment.author_id)}
-                    >
-                      <td className="px-4 py-4">
-                        <input
-                          type="checkbox"
-                          checked={selectedAuthors.includes(payment.author_id)}
-                          onChange={() =>
-                            toggleAuthorSelection(payment.author_id)
-                          }
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </td>
-                      <td className="px-4 py-4 text-sm text-gray-900">
-                        {payment.author_first_name} {payment.author_last_name}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-gray-700">
-                        {payment.email}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-gray-700">
-                        ₦{parseFloat(payment.total_pending_amount).toFixed(2)}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-gray-700">
-                        {payment.pending_count}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-yellow-600 font-semibold">
-                        Pending
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              <div className="mt-4">
-                <button
-                  onClick={handleProcessPayments}
-                  className="px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700"
-                >
-                  Process Payments
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      {error && (
-        <div className="mt-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md text-center">
-          <p>{error}</p>
-        </div>
-      )}
-
-      <Link
-        href="/admin/payment-summary"
-        className="mt-10 block text-center text-blue-600 underline"
-      >
-        View Payment Summary
-      </Link>
+      </main>
     </div>
   );
 };
+
+const EmptyState = ({ message }) => (
+  <div className="text-center py-20 bg-white border border-dashed border-slate-300 rounded-2xl">
+    <div className="bg-slate-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+      <Clock className="text-slate-400" size={24} />
+    </div>
+    <p className="text-slate-500 font-medium">{message}</p>
+  </div>
+);
 
 export default App;

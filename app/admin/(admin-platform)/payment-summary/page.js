@@ -135,23 +135,23 @@ const AdminFinancePage = () => {
           <div className="grid sm:grid-cols-2 gap-6 mt-6 text-gray-800">
             <div>
               <h3 className="text-lg font-semibold mb-1">Total Revenue</h3>
-              <p>₦{formatCurrency(summary.total_revenue)}</p>
+              <p>$ {formatCurrency(summary.total_revenue)}</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-1">Paystack Fees</h3>
-              <p>₦{formatCurrency(summary.paystack_fees)}</p>
+              <p>$ {formatCurrency(summary.paystack_fees)}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-1">Delivery Fees</h3>
-              <p>₦{formatCurrency(summary.delivery_fees)}</p>
+              <h3 className="text-lg font-semibold mb-1">Storage Fees</h3>
+              <p>$ {formatCurrency(summary.delivery_fees)}</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-1">Author Royalties</h3>
-              <p>₦{formatCurrency(summary.author_royalties)}</p>
+              <p>$ {formatCurrency(summary.author_royalties)}</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-1">Platform Profit</h3>
-              <p>₦{formatCurrency(summary.platform_profit)}</p>
+              <p>$ {formatCurrency(summary.platform_profit)}</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-1">Completed Sales</h3>
@@ -168,7 +168,7 @@ const AdminFinancePage = () => {
                 ([date, amount]) => (
                   <li key={date} className="flex justify-between">
                     <span>{date}</span>
-                    <span>₦{formatCurrency(amount)}</span>
+                    <span>$ {formatCurrency(amount)}</span>
                   </li>
                 )
               )}
