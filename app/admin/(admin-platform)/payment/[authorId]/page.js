@@ -25,8 +25,7 @@ export default function AuthorDetailsPage() {
   useEffect(() => {
     const fetchAuthorDetails = async () => {
       try {
-        const response = await api.get(`/admin/author_revenues/${authorId}`);
-        console.log(response)
+        const response = await api.get(`/admin/author_revenues/${authorId}`);      
         setData(response.data);
       } catch (err) {
         setError("Failed to load author details.");
