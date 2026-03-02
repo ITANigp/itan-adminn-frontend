@@ -26,6 +26,7 @@ export default function AuthorDetailsPage() {
     const fetchAuthorDetails = async () => {
       try {
         const response = await api.get(`/admin/author_revenues/${authorId}`);
+        console.log(response)
         setData(response.data);
       } catch (err) {
         setError("Failed to load author details.");
@@ -97,39 +98,42 @@ export default function AuthorDetailsPage() {
 
       <main className="max-w-7xl mx-auto px-4 mt-8">
         {/* Hero Section: Author Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-          <div className="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-200 flex flex-col justify-between">
-            <div className="flex items-start justify-between">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-10">
+          <div className="lg:col-span-2 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
               <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
-                    <User size={24} />
+                <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                  <div className="p-1.5 sm:p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                    <User className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <h1 className="text-3xl font-black text-slate-900">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900">
                     {data.author.name}
                   </h1>
                 </div>
-                <div className="flex items-center gap-4 text-slate-500 text-sm">
-                  <span className="flex items-center gap-1.5">
-                    <Mail size={14} /> {data.author.email}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 text-xs sm:text-sm">
+                  <span className="flex items-center gap-1.5 min-w-0">
+                    <Mail size={14} className="flex-shrink-0" />{" "}
+                    <span className="truncate max-w-[180px] sm:max-w-none">
+                      {data.author.email}
+                    </span>
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <BookOpen size={14} /> {data.pagination.total_count} Total
-                    Sales
+                    <BookOpen size={14} className="flex-shrink-0" />{" "}
+                    {data.pagination.total_count} Total Sales
                   </span>
                 </div>
               </div>
-              <span className="px-4 py-1.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-full border border-amber-100 uppercase">
+              <span className="self-start px-3 sm:px-4 py-1 sm:py-1.5 bg-amber-50 text-amber-700 text-[10px] sm:text-xs font-bold rounded-full border border-amber-100 uppercase whitespace-nowrap">
                 Awaiting Settlement
               </span>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-slate-100 grid grid-cols-2 gap-4">
+            <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-slate-100 grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase mb-1">
                   Account Status
                 </p>
-                <p className="text-slate-700 font-semibold">
+                <p className="text-slate-700 font-semibold text-sm sm:text-base">
                   Active Contributor
                 </p>
               </div>
@@ -137,7 +141,7 @@ export default function AuthorDetailsPage() {
                 <p className="text-xs font-bold text-slate-400 uppercase mb-1">
                   Last Recorded Sale
                 </p>
-                <p className="text-slate-700 font-semibold">
+                <p className="text-slate-700 font-semibold text-sm sm:text-base">
                   {data.pending_revenues[0]
                     ? new Date(
                         data.pending_revenues[0].created_at,
@@ -148,19 +152,21 @@ export default function AuthorDetailsPage() {
             </div>
           </div>
 
-          <div className="bg-indigo-600 rounded-3xl p-8 shadow-lg shadow-indigo-100 flex flex-col justify-center relative overflow-hidden">
+          <div className="bg-indigo-600 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-lg shadow-indigo-100 flex flex-col justify-center relative overflow-hidden">
             {/* Background Decoration */}
             <div className="absolute -right-4 -top-4 text-white opacity-10 rotate-12">
-              <TrendingUp size={160} />
+              <TrendingUp className="w-28 h-28 sm:w-40 sm:h-40" />
             </div>
-            <p className="text-indigo-100 font-medium mb-1 relative z-0">
+            <p className="text-indigo-100 font-medium mb-1 relative z-0 text-sm sm:text-base">
               Total Pending Payout
             </p>
-            <h2 className="text-5xl font-black text-white relative z-0 tracking-tight">
-              <span className="text-2xl font-light opacity-80 mr-1">$</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white relative z-0 tracking-tight">
+              <span className="text-lg sm:text-xl md:text-2xl font-light opacity-80 mr-1">
+                $
+              </span>
               {totalRevenue}
             </h2>
-            <p className="mt-4 text-indigo-200 text-xs font-medium bg-white/10 w-fit px-3 py-1 rounded-full">
+            <p className="mt-3 sm:mt-4 text-indigo-200 text-[10px] sm:text-xs font-medium bg-white/10 w-fit px-2 sm:px-3 py-1 rounded-full">
               Includes {data.pending_revenues.length} line items
             </p>
           </div>
@@ -180,16 +186,22 @@ export default function AuthorDetailsPage() {
               <thead>
                 <tr className="bg-slate-50/50">
                   <th className="px-8 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Product Info
+                    Book Title
                   </th>
                   <th className="px-8 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                     Purchase Details
                   </th>
                   <th className="px-8 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Delivery
+                    File size
                   </th>
                   <th className="px-8 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">
                     Net Revenue
+                  </th>
+                  <th className="px-8 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">
+                    Purchase Date
+                  </th>
+                  <th className="px-8 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">
+                    Reader's name
                   </th>
                 </tr>
               </thead>
@@ -241,6 +253,20 @@ export default function AuthorDetailsPage() {
                     <td className="px-8 py-5 text-right">
                       <span className="text-base font-black text-emerald-600">
                         ${sale.amount}
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <span className="text-base font-black text-emerald-600">
+                        {sale.purchase?.purchase_date
+                          ? new Date(
+                              sale.purchase.purchase_date,
+                            ).toLocaleDateString()
+                          : "N/A"}
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <span className="text-base font-black text-emerald-600">
+                        {sale.reader.reader_name}
                       </span>
                     </td>
                   </tr>
