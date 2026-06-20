@@ -49,6 +49,16 @@ export const getAllAuthors = async () => {
     console.log("Error fetching all Authors: ", err);
   }
 };
+export const deleteAuthor = async (authorId) => {
+  const response = await api.delete(`/admin/authors/${authorId}`);
+  return response.data;
+};
+
+export const deleteBook = async (bookId) => {
+  const response = await api.delete(`/admin/books/${bookId}`);
+  return response.data;
+};
+
 export const getAllReaders = async (page = 1, per_page = 20) => {
   try { 
     const response = await api.get(
