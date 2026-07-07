@@ -31,6 +31,11 @@ export const signOutAdmin = async () => {
   }
 };
 
+export const getDashboardSummary = async () => {
+  const response = await api.get("/admin/dashboard/summary");
+  return response.data.data;
+};
+
 export const getAllBooks = async () => {
   try {
     const response = await api.get("/admin/books");
@@ -59,18 +64,18 @@ export const deleteBook = async (bookId) => {
   return response.data;
 };
 
-export const getAllReaders = async (page = 1, per_page = 20) => {
-  try { 
-    const response = await api.get(
-      `admin/readers?page=${page}&per_page=${per_page}`
-    );
-    console.log("API Response:", response);
+export const getAllReaders = async (page = 1, per_page = 20, search = "") => {
+  try {
+    const params = new URLSearchParams({ page, per_page });
+    if (search) params.set("search", search);
+
+    const response = await api.get(`admin/readers?${params.toString()}`);
     return {
       data: response.data.data || [],
       meta: response.data.meta || null,
     };
   } catch (err) {
-    console.log("Error fetching all Readers: ", err);
-    return { data: [], meta: null };
+    console.error("Error fetching all Readers: ", err.response?.data || err);
+    throw err;
   }
 };

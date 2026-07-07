@@ -15,6 +15,7 @@ const BookComment = ({ book, onActionSubmit }) => {
   const [comment, setComment] = useState("");
   const [action, setAction] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const menuRef = useRef();
 
   useEffect(() => {
@@ -28,6 +29,7 @@ const BookComment = ({ book, onActionSubmit }) => {
   const handleClick = (type) => {
     setAction(type);
     setComment("");
+    setError(null);
     setShowModal(true);
     setShowMenu(false);
   };
@@ -35,9 +37,15 @@ const BookComment = ({ book, onActionSubmit }) => {
   const handleSubmit = async () => {
     if (!comment.trim()) return;
     setSubmitting(true);
+    setError(null);
     try {
       await onActionSubmit(book.id, action, comment);
       setShowModal(false);
+    } catch (err) {
+      setError(
+        err.response?.data?.status?.message ||
+          "Something went wrong. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -111,6 +119,12 @@ const BookComment = ({ book, onActionSubmit }) => {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
+
+            {error && (
+              <p className="mt-3 text-sm text-red-600" role="alert">
+                {error}
+              </p>
+            )}
 
             <div className="flex gap-3 mt-4">
               <button
