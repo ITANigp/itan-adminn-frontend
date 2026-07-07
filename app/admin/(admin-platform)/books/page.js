@@ -22,7 +22,7 @@ import { api, getAllBooks, deleteBook } from "@/utils/auth/adminApi";
 import BookComment from "@/components/BookComment";
 
 // ── Delete Modal ─────────────────────────────────────────────────────────────
-const DeleteModal = ({ book, onConfirm, onCancel, isDeleting }) => (
+const DeleteModal = ({ book, onConfirm, onCancel, isDeleting, error }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center">
     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
     <div className="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
@@ -35,6 +35,12 @@ const DeleteModal = ({ book, onConfirm, onCancel, isDeleting }) => (
         <span className="font-semibold text-gray-800">"{book.title}"</span>?
         This action cannot be undone.
       </p>
+      {error && (
+        <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <FontAwesomeIcon icon={faTimesCircle} className="mt-0.5 shrink-0 text-amber-500" />
+          <span>{error}</span>
+        </div>
+      )}
       <div className="flex gap-3">
         <button
           onClick={onCancel}
@@ -102,6 +108,7 @@ const Books = () => {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
 
   useEffect(() => {
     getAllBooks()
@@ -127,30 +134,29 @@ const Books = () => {
   });
 
   const handleActionSubmit = async (bookId, action, comment) => {
-    try {
-      const res = await api.patch(`/admin/books/${bookId}/${action}`, { admin_feedback: comment });
-      if (res.status === 200) {
-        setBooks((prev) =>
-          prev.map((b) =>
-            b.id === bookId ? { ...b, approval_status: action === "approve" ? "approved" : "rejected" } : b
-          )
-        );
-      }
-    } catch (err) {
-      console.error("Error submitting action:", err);
-    }
+    // Let errors propagate to the caller (BookComment) so the modal stays
+    // open and shows a message instead of silently closing on failure.
+    await api.patch(`/admin/books/${bookId}/${action}`, { admin_feedback: comment });
+    setBooks((prev) =>
+      prev.map((b) =>
+        b.id === bookId ? { ...b, approval_status: action === "approve" ? "approved" : "rejected" } : b
+      )
+    );
   };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     setDeletingId(deleteTarget.id);
+    setDeleteError(null);
     try {
       await deleteBook(deleteTarget.id);
       setBooks((prev) => prev.filter((b) => b.id !== deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete book. Please try again.");
+      setDeleteError(
+        err.response?.data?.status?.message ||
+          "Failed to delete book. Please try again."
+      );
     } finally {
       setDeletingId(null);
     }
@@ -304,7 +310,10 @@ const Books = () => {
                       <div className="flex items-center gap-2">
                         <BookComment book={book} onActionSubmit={handleActionSubmit} />
                         <button
-                          onClick={() => setDeleteTarget(book)}
+                          onClick={() => {
+                            setDeleteError(null);
+                            setDeleteTarget(book);
+                          }}
                           disabled={deletingId === book.id}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-100"
                         >
@@ -326,8 +335,13 @@ const Books = () => {
         <DeleteModal
           book={deleteTarget}
           onConfirm={handleDeleteConfirm}
-          onCancel={() => !deletingId && setDeleteTarget(null)}
+          onCancel={() => {
+            if (deletingId) return;
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }}
           isDeleting={!!deletingId}
+          error={deleteError}
         />
       )}
     </div>

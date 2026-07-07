@@ -13,12 +13,14 @@ import {
   faTrashAlt,
   faChevronRight,
   faSpinner,
+  faCheckCircle,
+  faHourglassHalf,
 } from "@fortawesome/free-solid-svg-icons";
 import { getAllAuthors, deleteAuthor } from "@/utils/auth/adminApi";
 import formatDate from "@/utils/formatDate";
 
 // ── Confirm Delete Modal ─────────────────────────────────────────────────────
-const DeleteModal = ({ author, onConfirm, onCancel, isDeleting }) => (
+const DeleteModal = ({ author, onConfirm, onCancel, isDeleting, error }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center">
     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
     <div className="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4 animate-in fade-in zoom-in-95 duration-200">
@@ -33,6 +35,12 @@ const DeleteModal = ({ author, onConfirm, onCancel, isDeleting }) => (
         </span>
         ? This will permanently remove the author and all their books.
       </p>
+      {error && (
+        <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <FontAwesomeIcon icon={faUserXmark} className="mt-0.5 shrink-0 text-amber-500" />
+          <span>{error}</span>
+        </div>
+      )}
       <div className="flex gap-3">
         <button
           onClick={onCancel}
@@ -59,6 +67,19 @@ const DeleteModal = ({ author, onConfirm, onCancel, isDeleting }) => (
     </div>
   </div>
 );
+
+// ── Status Badge ─────────────────────────────────────────────────────────────
+const StatusBadge = ({ verified, verifiedLabel, unverifiedLabel }) => {
+  const cls = verified
+    ? "bg-green-50 text-green-700 border-green-200"
+    : "bg-yellow-50 text-yellow-700 border-yellow-200";
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border ${cls}`}>
+      <FontAwesomeIcon icon={verified ? faCheckCircle : faHourglassHalf} className="text-[10px]" />
+      {verified ? verifiedLabel : unverifiedLabel}
+    </span>
+  );
+};
 
 // ── Stat Card ────────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, icon, iconBg, iconColor, border }) => (
@@ -107,6 +128,7 @@ const AuthorsPage = () => {
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -134,13 +156,16 @@ const AuthorsPage = () => {
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     setIsDeleting(true);
+    setDeleteError(null);
     try {
       await deleteAuthor(deleteTarget.id);
       setAuthors((prev) => prev.filter((a) => a.id !== deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete author. Please try again.");
+      setDeleteError(
+        err.response?.data?.status?.message ||
+          "Failed to delete author. Please try again."
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -186,79 +211,156 @@ const AuthorsPage = () => {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Author</th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
-                <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-16 text-center">
-                    <FontAwesomeIcon icon={faSpinner} className="animate-spin text-red-500 text-2xl mb-3" />
-                    <p className="text-gray-400 text-sm">Loading authors…</p>
-                  </td>
-                </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-16 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <FontAwesomeIcon icon={faUsers} className="text-gray-400 text-2xl" />
-                    </div>
-                    <p className="text-gray-500 font-medium">No authors found</p>
-                    <p className="text-gray-400 text-xs mt-1">Try adjusting your search</p>
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((author) => (
-                  <tr key={author.id} className="hover:bg-gray-50/70 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar
-                          src={author.author_profile_image_url}
-                          name={`${author.first_name || ""} ${author.last_name || ""}`}
-                        />
-                        <div>
-                          <p className="font-semibold text-gray-900">
-                            {author.first_name} {author.last_name}
-                          </p>
-                          <p className="text-xs text-gray-400">ID #{author.id?.toString().slice(0, 8)}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-gray-600">{author.email}</td>
-                    <td className="px-6 py-4 text-gray-600">{author.phone_number || "—"}</td>
-                    <td className="px-6 py-4 text-gray-500">{formatDate(author.created_at)}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Link
-                          href={`/admin/authors/author-details/${author.id}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                        >
-                          View <FontAwesomeIcon icon={faChevronRight} className="text-[10px]" />
-                        </Link>
-                        <button
-                          onClick={() => setDeleteTarget(author)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                          Delete
-                        </button>
-                      </div>
-                    </td>
+        {/* Body */}
+        {loading ? (
+          <div className="px-6 py-16 text-center">
+            <FontAwesomeIcon icon={faSpinner} className="animate-spin text-red-500 text-2xl mb-3" />
+            <p className="text-gray-400 text-sm">Loading authors…</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="px-6 py-16 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <FontAwesomeIcon icon={faUsers} className="text-gray-400 text-2xl" />
+            </div>
+            <p className="text-gray-500 font-medium">No authors found</p>
+            <p className="text-gray-400 text-xs mt-1">Try adjusting your search</p>
+          </div>
+        ) : (
+          <>
+            {/* Desktop / tablet table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-100">
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Author</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Verified</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">KYC</th>
+                    <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
+                    <th className="text-right px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {filtered.map((author) => (
+                    <tr key={author.id} className="hover:bg-gray-50/70 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <Avatar
+                            src={author.author_profile_image_url}
+                            name={`${author.first_name || ""} ${author.last_name || ""}`}
+                          />
+                          <div className="min-w-0">
+                            <p className="font-semibold text-gray-900 truncate">
+                              {author.first_name} {author.last_name}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 max-w-[200px] truncate">{author.email}</td>
+                      <td className="px-6 py-4 text-gray-600 whitespace-nowrap">{author.phone_number || "—"}</td>
+                      <td className="px-6 py-4">
+                        <StatusBadge
+                          verified={author.email_verified}
+                          verifiedLabel="Verified"
+                          unverifiedLabel="Unverified"
+                        />
+                      </td>
+                      <td className="px-6 py-4">
+                        <StatusBadge
+                          verified={author.kyc_completed}
+                          verifiedLabel="Completed"
+                          unverifiedLabel="Pending"
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDate(author.created_at)}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/admin/authors/author-details/${author.id}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                          >
+                            View <FontAwesomeIcon icon={faChevronRight} className="text-[10px]" />
+                          </Link>
+                          <button
+                            onClick={() => setDeleteTarget(author)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile card list */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {filtered.map((author) => (
+                <div key={author.id} className="p-4 flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar
+                      src={author.author_profile_image_url}
+                      name={`${author.first_name || ""} ${author.last_name || ""}`}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-gray-900 truncate">
+                        {author.first_name} {author.last_name}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate">{author.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Phone</p>
+                      <p className="text-gray-700">{author.phone_number || "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Joined</p>
+                      <p className="text-gray-700">{formatDate(author.created_at)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Email Verified</p>
+                      <StatusBadge
+                        verified={author.email_verified}
+                        verifiedLabel="Verified"
+                        unverifiedLabel="Unverified"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">KYC</p>
+                      <StatusBadge
+                        verified={author.kyc_completed}
+                        verifiedLabel="Completed"
+                        unverifiedLabel="Pending"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <Link
+                      href={`/admin/authors/author-details/${author.id}`}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    >
+                      View <FontAwesomeIcon icon={faChevronRight} className="text-[10px]" />
+                    </Link>
+                    <button
+                      onClick={() => setDeleteTarget(author)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                    >
+                      <FontAwesomeIcon icon={faTrashAlt} />
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Delete Modal */}
@@ -266,8 +368,13 @@ const AuthorsPage = () => {
         <DeleteModal
           author={deleteTarget}
           onConfirm={handleDeleteConfirm}
-          onCancel={() => !isDeleting && setDeleteTarget(null)}
+          onCancel={() => {
+            if (isDeleting) return;
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }}
           isDeleting={isDeleting}
+          error={deleteError}
         />
       )}
     </div>
