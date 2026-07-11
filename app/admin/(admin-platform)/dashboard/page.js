@@ -263,7 +263,7 @@ export default function Dashboard() {
             <p className="text-sm text-gray-500 mb-4">
               Completed purchase revenue over the last 6 months
             </p>
-            {loading ? (
+            {loading || !summary ? (
               <div className="h-[320px] flex items-center justify-center text-gray-400 text-sm">
                 Loading chart...
               </div>
@@ -281,7 +281,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-black/5 overflow-x-auto">
             <h2 className="mb-4 text-lg font-semibold text-gray-900">Recent Purchases</h2>
-            {loading ? (
+            {loading || !summary ? (
               <div className="text-sm text-gray-400 py-6 text-center">Loading...</div>
             ) : summary.recent_purchases.length === 0 ? (
               <div className="text-sm text-gray-400 py-6 text-center">
@@ -319,7 +319,7 @@ export default function Dashboard() {
 
           <div className="bg-white p-5 rounded-2xl shadow-sm ring-1 ring-black/5">
             <h2 className="mb-4 text-lg font-semibold text-gray-900">Recent Activity</h2>
-            {loading ? (
+            {loading || !summary ? (
               <div className="text-sm text-gray-400 py-6 text-center">Loading...</div>
             ) : summary.recent_activity.length === 0 ? (
               <div className="text-sm text-gray-400 py-6 text-center">
